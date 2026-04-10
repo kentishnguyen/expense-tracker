@@ -13,48 +13,24 @@ export default async function DashboardPage() {
   const monthStart = startOfMonth(new Date())
   const monthEnd = endOfMonth(new Date())
 
-  // Fetch expenses for this month
   const { data: expenses } = await supabase
     .from("expenses")
-    .select(`
-      *,
-      category:categories(name, color)
-    `)
+    .select(`*, category:categories(name, color)`)
     .eq("user_id", user.id)
     .gte("date", monthStart.toISOString().split("T")[0])
     .lte("date", monthEnd.toISOString().split("T")[0])
     .order("date", { ascending: false })
 
-  // Fetch categories
-  const { data: categories } = await supabase
-    .from("categories")
-    .select("*")
-    .eq("user_id", user.id)
-
-<<<<<<< HEAD
-  // Fetch profile for monthly budget
   const { data: profile } = await supabase
     .from("profiles")
     .select("monthly_budget")
-=======
-  // Fetch profile for monthly budget and chequing balance
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("monthly_budget, chequing_balance")
->>>>>>> other/main
     .eq("id", user.id)
     .single()
 
-  // Calculate totals
   const totalSpent = expenses?.reduce((sum, exp) => sum + Number(exp.amount), 0) || 0
   const monthlyBudget = Number(profile?.monthly_budget || 0)
-<<<<<<< HEAD
-=======
-  const chequingBalance = Number(profile?.chequing_balance || 0)
->>>>>>> other/main
   const transactionCount = expenses?.length || 0
 
-  // Calculate category breakdown
   const categoryTotals = new Map<string, { name: string; amount: number; color: string }>()
   expenses?.forEach((expense) => {
     const catName = expense.category?.name || "Uncategorized"
@@ -70,20 +46,15 @@ export default async function DashboardPage() {
 
   const topCategory = categoryData[0]?.name || ""
 
-  // Calculate daily spending for last 7 days
   const dailyData = []
   for (let i = 6; i >= 0; i--) {
     const date = subDays(new Date(), i)
     const dateStr = format(date, "yyyy-MM-dd")
     const dayExpenses = expenses?.filter((e) => e.date === dateStr) || []
     const dayTotal = dayExpenses.reduce((sum, exp) => sum + Number(exp.amount), 0)
-    dailyData.push({
-      date: format(date, "EEE"),
-      amount: dayTotal,
-    })
+    dailyData.push({ date: format(date, "EEE"), amount: dayTotal })
   }
 
-  // Recent transactions (last 5)
   const recentTransactions = (expenses || []).slice(0, 5).map((exp) => ({
     id: exp.id,
     merchant: exp.merchant,
@@ -96,29 +67,16 @@ export default async function DashboardPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Welcome back! Here&apos;s your financial overview.
-        </p>
+        <p className="text-muted-foreground">Welcome back! Here&apos;s your financial overview.</p>
       </div>
-
       <SummaryCards
         totalSpent={totalSpent}
         monthlyBudget={monthlyBudget}
         transactionCount={transactionCount}
         topCategory={topCategory}
-<<<<<<< HEAD
-=======
-        chequingBalance={chequingBalance}
->>>>>>> other/main
       />
-
       <ExpenseCharts categoryData={categoryData} dailyData={dailyData} />
-
       <RecentTransactions transactions={recentTransactions} />
     </div>
   )
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> other/main

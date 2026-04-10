@@ -25,10 +25,6 @@ interface Profile {
   name: string | null
   email: string | null
   monthly_budget: number | null
-<<<<<<< HEAD
-=======
-  chequing_balance: number | null
->>>>>>> other/main
 }
 
 interface Category {
@@ -53,10 +49,6 @@ export function SettingsContent({
 }: SettingsContentProps) {
   const [name, setName] = useState(profile?.name || "")
   const [monthlyBudget, setMonthlyBudget] = useState(profile?.monthly_budget?.toString() || "")
-<<<<<<< HEAD
-=======
-  const [chequingBalance, setChequingBalance] = useState(profile?.chequing_balance?.toString() || "")
->>>>>>> other/main
   const [isSaving, setIsSaving] = useState(false)
   const [showCategoryForm, setShowCategoryForm] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
@@ -67,18 +59,12 @@ export function SettingsContent({
   async function handleSaveProfile(e: React.FormEvent) {
     e.preventDefault()
     setIsSaving(true)
-
     await supabase.from("profiles").upsert({
       id: userId,
       name,
       email: userEmail,
       monthly_budget: parseFloat(monthlyBudget) || 0,
-<<<<<<< HEAD
-=======
-      chequing_balance: parseFloat(chequingBalance) || 0,
->>>>>>> other/main
     })
-
     setIsSaving(false)
     router.refresh()
   }
@@ -102,7 +88,6 @@ export function SettingsContent({
 
   return (
     <div className="space-y-6">
-      {/* Profile Settings */}
       <Card className="bg-card border-border">
         <CardHeader>
           <CardTitle className="text-foreground">Profile</CardTitle>
@@ -130,30 +115,9 @@ export function SettingsContent({
                 disabled
                 className="bg-input border-border text-muted-foreground max-w-md"
               />
-              <p className="text-xs text-muted-foreground">
-                Email cannot be changed.
-              </p>
+              <p className="text-xs text-muted-foreground">Email cannot be changed.</p>
             </div>
             <div className="space-y-2">
-<<<<<<< HEAD
-=======
-              <Label htmlFor="chequing_balance" className="text-foreground">Chequing Balance ($)</Label>
-              <Input
-                id="chequing_balance"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="e.g. 5000.00"
-                value={chequingBalance}
-                onChange={(e) => setChequingBalance(e.target.value)}
-                className="bg-input border-border text-foreground max-w-md"
-              />
-              <p className="text-xs text-muted-foreground">
-                Your current chequing account balance. This will be used to fund your monthly budget.
-              </p>
-            </div>
-            <div className="space-y-2">
->>>>>>> other/main
               <Label htmlFor="monthly_budget" className="text-foreground">Monthly Budget ($)</Label>
               <Input
                 id="monthly_budget"
@@ -165,13 +129,7 @@ export function SettingsContent({
                 onChange={(e) => setMonthlyBudget(e.target.value)}
                 className="bg-input border-border text-foreground max-w-md"
               />
-              <p className="text-xs text-muted-foreground">
-<<<<<<< HEAD
-                Set your overall monthly spending limit.
-=======
-                Set your overall monthly spending limit. This amount is deducted from your Chequing.
->>>>>>> other/main
-              </p>
+              <p className="text-xs text-muted-foreground">Set your overall monthly spending limit.</p>
             </div>
             <Button type="submit" disabled={isSaving}>
               {isSaving ? (
@@ -187,7 +145,6 @@ export function SettingsContent({
         </CardContent>
       </Card>
 
-      {/* Categories Settings */}
       <Card className="bg-card border-border">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
@@ -214,10 +171,7 @@ export function SettingsContent({
                   className="flex items-center justify-between p-4 rounded-lg bg-secondary/50"
                 >
                   <div className="flex items-center gap-3">
-                    <div
-                      className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: category.color }}
-                    />
+                    <div className="w-4 h-4 rounded-full" style={{ backgroundColor: category.color }} />
                     <div>
                       <p className="font-medium text-foreground">{category.name}</p>
                       {category.budget_limit > 0 && (
@@ -228,18 +182,10 @@ export function SettingsContent({
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleEditCategory(category)}
-                    >
+                    <Button variant="ghost" size="icon" onClick={() => handleEditCategory(category)}>
                       <Pencil className="h-4 w-4" />
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setDeleteId(category.id)}
-                    >
+                    <Button variant="ghost" size="icon" onClick={() => setDeleteId(category.id)}>
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </div>
@@ -278,8 +224,4 @@ export function SettingsContent({
       </AlertDialog>
     </div>
   )
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> other/main
