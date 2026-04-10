@@ -70,7 +70,7 @@ export function Sidebar() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-primary">
               <Wallet className="h-5 w-5 text-sidebar-primary-foreground" />
             </div>
-            <span className="text-lg font-bold text-sidebar-foreground">ExpenseTrack</span>
+            <span className="text-lg font-bold text-sidebar-foreground">KhangXP</span>
           </div>
 
           {/* Navigation */}

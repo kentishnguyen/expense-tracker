@@ -25,6 +25,7 @@ interface Profile {
   name: string | null
   email: string | null
   monthly_budget: number | null
+  chequing_balance: number | null
 }
 
 interface Category {
@@ -49,6 +50,7 @@ export function SettingsContent({
 }: SettingsContentProps) {
   const [name, setName] = useState(profile?.name || "")
   const [monthlyBudget, setMonthlyBudget] = useState(profile?.monthly_budget?.toString() || "")
+  const [chequingBalance, setChequingBalance] = useState(profile?.chequing_balance?.toString() || "")
   const [isSaving, setIsSaving] = useState(false)
   const [showCategoryForm, setShowCategoryForm] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
@@ -65,6 +67,7 @@ export function SettingsContent({
       name,
       email: userEmail,
       monthly_budget: parseFloat(monthlyBudget) || 0,
+      chequing_balance: parseFloat(chequingBalance) || 0,
     })
 
     setIsSaving(false)
@@ -123,6 +126,22 @@ export function SettingsContent({
               </p>
             </div>
             <div className="space-y-2">
+              <Label htmlFor="chequing_balance" className="text-foreground">Chequing Balance ($)</Label>
+              <Input
+                id="chequing_balance"
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="e.g. 5000.00"
+                value={chequingBalance}
+                onChange={(e) => setChequingBalance(e.target.value)}
+                className="bg-input border-border text-foreground max-w-md"
+              />
+              <p className="text-xs text-muted-foreground">
+                Your current chequing account balance. This will be used to fund your monthly budget.
+              </p>
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="monthly_budget" className="text-foreground">Monthly Budget ($)</Label>
               <Input
                 id="monthly_budget"
@@ -135,7 +154,7 @@ export function SettingsContent({
                 className="bg-input border-border text-foreground max-w-md"
               />
               <p className="text-xs text-muted-foreground">
-                Set your overall monthly spending limit.
+                Set your overall monthly spending limit. This amount is deducted from your Chequing.
               </p>
             </div>
             <Button type="submit" disabled={isSaving}>

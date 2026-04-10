@@ -31,16 +31,17 @@ export default async function DashboardPage() {
     .select("*")
     .eq("user_id", user.id)
 
-  // Fetch profile for monthly budget
+  // Fetch profile for monthly budget and chequing balance
   const { data: profile } = await supabase
     .from("profiles")
-    .select("monthly_budget")
+    .select("monthly_budget, chequing_balance")
     .eq("id", user.id)
     .single()
 
   // Calculate totals
   const totalSpent = expenses?.reduce((sum, exp) => sum + Number(exp.amount), 0) || 0
   const monthlyBudget = Number(profile?.monthly_budget || 0)
+  const chequingBalance = Number(profile?.chequing_balance || 0)
   const transactionCount = expenses?.length || 0
 
   // Calculate category breakdown
@@ -95,6 +96,7 @@ export default async function DashboardPage() {
         monthlyBudget={monthlyBudget}
         transactionCount={transactionCount}
         topCategory={topCategory}
+        chequingBalance={chequingBalance}
       />
 
       <ExpenseCharts categoryData={categoryData} dailyData={dailyData} />
