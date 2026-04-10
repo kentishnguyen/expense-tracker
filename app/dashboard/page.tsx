@@ -21,14 +21,21 @@ export default async function DashboardPage() {
     .lte("date", monthEnd.toISOString().split("T")[0])
     .order("date", { ascending: false })
 
+  const { data: incomes } = await supabase
+    .from("incomes")
+    .select("amount")
+    .eq("user_id", user.id)
+
   const { data: profile } = await supabase
     .from("profiles")
-    .select("monthly_budget")
+    .select("monthly_budget, chequing_balance")
     .eq("id", user.id)
     .single()
 
   const totalSpent = expenses?.reduce((sum, exp) => sum + Number(exp.amount), 0) || 0
+  const totalIncome = incomes?.reduce((sum, inc) => sum + Number(inc.amount), 0) || 0
   const monthlyBudget = Number(profile?.monthly_budget || 0)
+  const chequingBalance = Number(profile?.chequing_balance || 0)
   const transactionCount = expenses?.length || 0
 
   const categoryTotals = new Map<string, { name: string; amount: number; color: string }>()
@@ -72,8 +79,10 @@ export default async function DashboardPage() {
       <SummaryCards
         totalSpent={totalSpent}
         monthlyBudget={monthlyBudget}
+        chequingBalance={chequingBalance}
         transactionCount={transactionCount}
         topCategory={topCategory}
+        totalIncome={totalIncome}
       />
       <ExpenseCharts categoryData={categoryData} dailyData={dailyData} />
       <RecentTransactions transactions={recentTransactions} />

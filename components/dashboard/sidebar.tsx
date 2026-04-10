@@ -15,12 +15,14 @@ import {
   Wallet,
   Menu,
   X,
+  TrendingUp,
 } from "lucide-react"
 import { useState } from "react"
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/dashboard/expenses", label: "Expenses", icon: Receipt },
+  { href: "/dashboard/income", label: "Income", icon: TrendingUp },
   { href: "/dashboard/scanner", label: "Receipt Scanner", icon: ScanLine },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ]
