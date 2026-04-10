@@ -7,8 +7,13 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
+<<<<<<< HEAD
   title: 'ExpenseTrack - Personal Expense Tracker',
   description: 'Track your expenses, manage budgets, and gain financial insights',
+=======
+  title: 'KhangXP - Personal Expense Tracker',
+  description: 'Save your wallet with Khang - Track expenses, manage budgets, and gain financial insights',
+>>>>>>> other/main
   generator: 'v0.app',
   icons: {
     icon: [

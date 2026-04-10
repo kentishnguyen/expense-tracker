@@ -21,15 +21,22 @@ export default async function HomePage() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
               <Wallet className="h-5 w-5 text-primary-foreground" />
             </div>
+<<<<<<< HEAD
             <span className="text-lg font-bold text-foreground">ExpenseTrack</span>
+=======
+            <span className="text-lg font-bold text-foreground">KhangXP</span>
+>>>>>>> other/main
           </div>
           <div className="flex items-center gap-4">
             <Button variant="ghost" asChild>
               <Link href="/auth/login">Sign in</Link>
             </Button>
+<<<<<<< HEAD
             <Button asChild>
               <Link href="/auth/sign-up">Get Started</Link>
             </Button>
+=======
+>>>>>>> other/main
           </div>
         </div>
       </header>
@@ -38,6 +45,7 @@ export default async function HomePage() {
       <main className="container mx-auto px-4 py-16 md:py-24">
         <div className="text-center max-w-3xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 text-balance">
+<<<<<<< HEAD
             Take Control of Your Finances
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground mb-8 text-pretty">
@@ -47,6 +55,14 @@ export default async function HomePage() {
             <Button size="lg" asChild>
               <Link href="/auth/sign-up">Start Free Today</Link>
             </Button>
+=======
+            Save Your Wallet with Khang
+          </h1>
+          <p className="text-lg md:text-xl text-muted-foreground mb-8 text-pretty">
+            Track your expenses, set budgets, and gain insights into your spending habits with KhangXP. The simple, powerful way to manage your money.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+>>>>>>> other/main
             <Button size="lg" variant="outline" asChild>
               <Link href="/auth/login">Sign in</Link>
             </Button>
@@ -98,7 +114,11 @@ export default async function HomePage() {
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center gap-2 text-muted-foreground">
             <Wallet className="h-4 w-4" />
+<<<<<<< HEAD
             <span className="text-sm">ExpenseTrack - Manage your finances with ease</span>
+=======
+            <span className="text-sm">KhangXP - Manage your finances with ease</span>
+>>>>>>> other/main
           </div>
         </div>
       </footer>
