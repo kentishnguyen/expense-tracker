@@ -1,7 +1,7 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { DollarSign, TrendingUp, TrendingDown, Receipt, Landmark, ArrowDownRight, ArrowUpRight } from "lucide-react"
+import { DollarSign, TrendingUp, TrendingDown, Receipt, Landmark } from "lucide-react"
 
 interface SummaryCardsProps {
   totalSpent: number
@@ -22,59 +22,27 @@ export function SummaryCards({
 }: SummaryCardsProps) {
   const budgetPercentage = monthlyBudget > 0 ? (totalSpent / monthlyBudget) * 100 : 0
   const budgetRemaining = monthlyBudget - totalSpent
-  const availableBalance = chequingBalance - monthlyBudget
+
+  // Chequing = base balance set by user + all income - total spent this month
+  const currentChequing = chequingBalance + totalIncome - totalSpent
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 
       {/* Chequing Balance */}
-      <Card className="bg-card border-border lg:col-span-1">
+      <Card className="bg-card border-border">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground">Chequing Balance</CardTitle>
           <Landmark className="h-4 w-4 text-primary" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-foreground">
-            ${chequingBalance.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+          <div className={`text-2xl font-bold ${currentChequing >= 0 ? "text-foreground" : "text-destructive"}`}>
+            ${Math.abs(currentChequing).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+            {currentChequing < 0 && <span className="text-sm ml-1">overdrawn</span>}
           </div>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-            <ArrowDownRight className="h-3 w-3 text-orange-400" />
-            <span className="text-orange-400">
-              -${monthlyBudget.toLocaleString("en-US", { minimumFractionDigits: 2 })} budget
-            </span>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Available After Budget */}
-      <Card className="bg-card border-border lg:col-span-1">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">Available Balance</CardTitle>
-          {availableBalance >= 0 ? (
-            <TrendingUp className="h-4 w-4 text-emerald-500" />
-          ) : (
-            <TrendingDown className="h-4 w-4 text-destructive" />
-          )}
-        </CardHeader>
-        <CardContent>
-          <div className={`text-2xl font-bold ${availableBalance >= 0 ? "text-emerald-500" : "text-destructive"}`}>
-            ${Math.abs(availableBalance).toLocaleString("en-US", { minimumFractionDigits: 2 })}
-          </div>
-          <p className="text-xs text-muted-foreground mt-1">After monthly budget</p>
-        </CardContent>
-      </Card>
-
-      {/* Total Income */}
-      <Card className="bg-card border-border lg:col-span-1">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">Total Income</CardTitle>
-          <ArrowUpRight className="h-4 w-4 text-emerald-500" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold text-emerald-500">
-            ${totalIncome.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-          </div>
-          <p className="text-xs text-muted-foreground mt-1">All recorded income</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Base ${chequingBalance.toLocaleString("en-US", { minimumFractionDigits: 2 })} + income − spent
+          </p>
         </CardContent>
       </Card>
 
@@ -107,7 +75,7 @@ export function SummaryCards({
             ${Math.abs(budgetRemaining).toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </div>
           <p className="text-xs text-muted-foreground mt-1">
-            {budgetPercentage.toFixed(0)}% of budget used
+            {budgetPercentage.toFixed(0)}% of ${monthlyBudget.toLocaleString("en-US", { minimumFractionDigits: 2 })} used
           </p>
         </CardContent>
       </Card>
