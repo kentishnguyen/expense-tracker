@@ -92,9 +92,9 @@ export function StatementUploader({ userId, categories }: StatementUploaderProps
         }),
       })
 
-      if (!res.ok) throw new Error("Failed to scan statement")
-
       const data = await res.json()
+
+      if (!res.ok) throw new Error(data.error || "Failed to scan statement")
 
       const parsed: Transaction[] = (data.transactions || []).map((t: any, i: number) => ({
         id: `txn-${i}`,
@@ -107,7 +107,7 @@ export function StatementUploader({ userId, categories }: StatementUploaderProps
         included: true,
       }))
 
-      if (parsed.length === 0) throw new Error("No transactions found. Make sure the PDF is a valid bank statement.")
+      if (parsed.length === 0) throw new Error("Gemini found 0 transactions. Try a clearer PDF or check the server logs for details.")
 
       setTransactions(parsed)
       setScanStatus("")
