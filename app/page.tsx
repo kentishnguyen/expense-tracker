@@ -1,103 +1,101 @@
 import { createClient } from "@/lib/supabase/server"
-import { redirect } from "next/navigation"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Wallet, BarChart3, Receipt, ScanLine } from "lucide-react"
+import { SummaryCards } from "@/components/dashboard/summary-cards"
+import { ExpenseCharts } from "@/components/dashboard/expense-charts"
+import { RecentTransactions } from "@/components/dashboard/recent-transactions"
+import { startOfMonth, endOfMonth, format, subMonths } from "date-fns"
 
-export default async function HomePage() {
+export default async function DashboardPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (user) {
-    redirect("/dashboard")
+  if (!user) return null
+
+  const monthStart = startOfMonth(new Date())
+  const monthEnd = endOfMonth(new Date())
+
+  const sixMonthsAgo = startOfMonth(subMonths(new Date(), 5))
+
+  const { data: expenses } = await supabase
+    .from("expenses")
+    .select(`*, category:categories(name, color)`)
+    .eq("user_id", user.id)
+    .gte("date", sixMonthsAgo.toISOString().split("T")[0])
+    .lte("date", monthEnd.toISOString().split("T")[0])
+    .order("date", { ascending: false })
+
+  // Current month expenses only (for summary cards)
+  const thisMonthExpenses = expenses?.filter(e =>
+    e.date >= monthStart.toISOString().split("T")[0] &&
+    e.date <= monthEnd.toISOString().split("T")[0]
+  ) || []
+
+  const { data: incomes } = await supabase
+    .from("incomes")
+    .select("amount")
+    .eq("user_id", user.id)
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("monthly_budget, chequing_balance")
+    .eq("id", user.id)
+    .single()
+
+  const totalSpent = thisMonthExpenses.reduce((sum, exp) => sum + Number(exp.amount), 0)
+  const totalIncome = incomes?.reduce((sum, inc) => sum + Number(inc.amount), 0) || 0
+  const monthlyBudget = Number(profile?.monthly_budget || 0)
+  const chequingBalance = Number(profile?.chequing_balance || 0)
+  const transactionCount = thisMonthExpenses.length
+
+  const categoryTotals = new Map<string, { name: string; amount: number; color: string }>()
+  thisMonthExpenses.forEach((expense) => {
+    const catName = expense.category?.name || "Uncategorized"
+    const catColor = expense.category?.color || "#6b7280"
+    const current = categoryTotals.get(catName) || { name: catName, amount: 0, color: catColor }
+    current.amount += Number(expense.amount)
+    categoryTotals.set(catName, current)
+  })
+
+  const categoryData = Array.from(categoryTotals.values())
+    .sort((a, b) => b.amount - a.amount)
+    .slice(0, 6)
+
+  const topCategory = categoryData[0]?.name || ""
+
+  const monthlyData = []
+  for (let i = 5; i >= 0; i--) {
+    const monthDate = subMonths(new Date(), i)
+    const mStart = startOfMonth(monthDate).toISOString().split("T")[0]
+    const mEnd = endOfMonth(monthDate).toISOString().split("T")[0]
+    const monthTotal = expenses
+      ?.filter(e => e.date >= mStart && e.date <= mEnd)
+      .reduce((sum, exp) => sum + Number(exp.amount), 0) || 0
+    monthlyData.push({ date: format(monthDate, "MMM"), amount: monthTotal })
   }
 
+  const recentTransactions = (expenses || []).slice(0, 5).map((exp) => ({
+    id: exp.id,
+    merchant: exp.merchant,
+    amount: exp.amount,
+    date: exp.date,
+    category: exp.category,
+  }))
+
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <Wallet className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="text-lg font-bold text-foreground">KhangXP</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" asChild>
-              <Link href="/auth/login">Sign in</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/auth/sign-up">Get Started</Link>
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-16 md:py-24">
-        <div className="text-center max-w-3xl mx-auto">
-          <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 text-balance">
-            Save Your Wallet with Khang
-          </h1>
-          <p className="text-lg md:text-xl text-muted-foreground mb-8 text-pretty">
-            Track your expenses, set budgets, and gain insights into your spending habits with KhangXP. The simple, powerful way to manage your money.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" asChild>
-              <Link href="/auth/sign-up">Start Free Today</Link>
-            </Button>
-            <Button size="lg" variant="outline" asChild>
-              <Link href="/auth/login">Sign in</Link>
-            </Button>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8 mt-24">
-          <div className="text-center p-6 rounded-lg bg-card border border-border">
-            <div className="flex justify-center mb-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                <BarChart3 className="h-6 w-6 text-primary" />
-              </div>
-            </div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">Visual Analytics</h3>
-            <p className="text-muted-foreground">
-              Beautiful charts and graphs to visualize your spending patterns and trends.
-            </p>
-          </div>
-
-          <div className="text-center p-6 rounded-lg bg-card border border-border">
-            <div className="flex justify-center mb-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                <Receipt className="h-6 w-6 text-primary" />
-              </div>
-            </div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">Budget Tracking</h3>
-            <p className="text-muted-foreground">
-              Set monthly budgets for categories and track your progress in real-time.
-            </p>
-          </div>
-
-          <div className="text-center p-6 rounded-lg bg-card border border-border">
-            <div className="flex justify-center mb-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                <ScanLine className="h-6 w-6 text-primary" />
-              </div>
-            </div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">Receipt Scanner</h3>
-            <p className="text-muted-foreground">
-              Snap a photo of your receipt and automatically extract expense details.
-            </p>
-          </div>
-        </div>
-      </main>
-
-      <footer className="border-t border-border mt-24">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-center gap-2 text-muted-foreground">
-            <Wallet className="h-4 w-4" />
-            <span className="text-sm">KhangXP - Manage your finances with ease</span>
-          </div>
-        </div>
-      </footer>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+        <p className="text-muted-foreground">Welcome back! Here&apos;s your financial overview.</p>
+      </div>
+      <SummaryCards
+        totalSpent={totalSpent}
+        monthlyBudget={monthlyBudget}
+        chequingBalance={chequingBalance}
+        transactionCount={transactionCount}
+        topCategory={topCategory}
+        totalIncome={totalIncome}
+      />
+      <ExpenseCharts categoryData={categoryData} monthlyData={monthlyData} />
+      <RecentTransactions transactions={recentTransactions} />
     </div>
   )
 }
