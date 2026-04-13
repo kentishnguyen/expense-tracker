@@ -1,35 +1,27 @@
-import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
-import './globals.css'
+import { createClient } from "@/lib/supabase/server"
+import { redirect } from "next/navigation"
+import { Sidebar } from "@/components/dashboard/sidebar"
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: 'KhangXP - Personal Expense Tracker',
-  description: 'Save your wallet with Khang - Track expenses, manage budgets, and gain financial insights',
-  generator: 'v0.app',
-  icons: {
-    icon: [
-      { url: '/favicon.ico' },
-      { url: '/favicon.svg', type: 'image/svg+xml' },
-    ],
-    apple: '/apple-icon.png',
-  },
-}
-
-export default function RootLayout({
+export default async function DashboardLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect("/auth/login")
+  }
+
   return (
-    <html lang="en">
-      <body className="font-sans antialiased">
-        {children}
-        {process.env.NODE_ENV === 'production' && <Analytics />}
-      </body>
-    </html>
+    <div className="min-h-screen bg-background">
+      <Sidebar />
+      <main className="md:ml-64 min-h-screen">
+        <div className="p-4 pt-16 md:p-8 md:pt-8">
+          {children}
+        </div>
+      </main>
+    </div>
   )
 }
