@@ -69,11 +69,54 @@ Rules:
     )
 
     const data = await response.json()
-    console.log("Gemini response:", JSON.stringify(data).slice(0, 500))
 
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "[]"
+    // Log the full Gemini response for debugging
+    console.log("Gemini status:", response.status)
+    console.log("Gemini full response:", JSON.stringify(data, null, 2))
+
+    // Check for Gemini API errors
+    if (data.error) {
+      console.error("Gemini API error:", data.error)
+      return NextResponse.json(
+        { error: `Gemini error: ${data.error.message || JSON.stringify(data.error)}` },
+        { status: 500 }
+      )
+    }
+
+    // Check for blocked content
+    const candidate = data.candidates?.[0]
+    if (!candidate) {
+      console.error("No candidates returned. Prompt feedback:", data.promptFeedback)
+      return NextResponse.json(
+        { error: `No response from Gemini. Reason: ${data.promptFeedback?.blockReason || "unknown"}` },
+        { status: 500 }
+      )
+    }
+
+    // Check finish reason
+    if (candidate.finishReason && candidate.finishReason !== "STOP") {
+      console.error("Unexpected finish reason:", candidate.finishReason)
+      return NextResponse.json(
+        { error: `Gemini stopped early: ${candidate.finishReason}` },
+        { status: 500 }
+      )
+    }
+
+    const text = candidate.content?.parts?.[0]?.text || "[]"
+    console.log("Raw text from Gemini:", text.slice(0, 500))
+
     const clean = text.replace(/```json|```/g, "").trim()
-    const transactions = JSON.parse(clean)
+
+    let transactions
+    try {
+      transactions = JSON.parse(clean)
+    } catch (parseErr) {
+      console.error("JSON parse failed. Raw text was:", text)
+      return NextResponse.json(
+        { error: "Gemini returned invalid JSON. Check server logs." },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json({ transactions })
   } catch (err) {
