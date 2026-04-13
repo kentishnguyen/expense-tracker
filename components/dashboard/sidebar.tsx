@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation"
 import {
   LayoutDashboard,
   Receipt,
-  ScanLine,
+  FileText,
   Settings,
   LogOut,
   Wallet,
@@ -23,7 +23,7 @@ const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/dashboard/expenses", label: "Expenses", icon: Receipt },
   { href: "/dashboard/income", label: "Income", icon: TrendingUp },
-  { href: "/dashboard/scanner", label: "Receipt Scanner", icon: ScanLine },
+  { href: "/dashboard/statements", label: "Bank Statements", icon: FileText },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ]
 
