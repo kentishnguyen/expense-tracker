@@ -22,14 +22,14 @@ interface CategoryData {
   color: string
 }
 
-interface DailyData {
+interface MonthlyData {
   date: string
   amount: number
 }
 
 interface ExpenseChartsProps {
   categoryData: CategoryData[]
-  dailyData: DailyData[]
+  monthlyData: MonthlyData[]
 }
 
 const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string }) => {
@@ -60,7 +60,7 @@ const PieTooltip = ({ active, payload }: { active?: boolean; payload?: { name: s
   return null
 }
 
-export function ExpenseCharts({ categoryData, dailyData }: ExpenseChartsProps) {
+export function ExpenseCharts({ categoryData, monthlyData }: ExpenseChartsProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {/* Bar Chart - Category Breakdown */}
@@ -136,12 +136,12 @@ export function ExpenseCharts({ categoryData, dailyData }: ExpenseChartsProps) {
       {/* Line Chart - Daily Trend */}
       <Card className="bg-card border-border">
         <CardHeader>
-          <CardTitle className="text-foreground">Daily Spending Trend</CardTitle>
+          <CardTitle className="text-foreground">Monthly Spending Trend</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={dailyData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+              <LineChart data={monthlyData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.27 0.01 260)" />
                 <XAxis
                   dataKey="date"
